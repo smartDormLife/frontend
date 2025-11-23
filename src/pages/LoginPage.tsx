@@ -10,6 +10,10 @@ export function LoginPage() {
   const { login } = useAuth()
   const navigate = useNavigate()
   const [form, setForm] = useState({ email: '', password: '' })
+  const handleGoogleLogin = () => {
+    const googleUrl = import.meta.env.VITE_GOOGLE_OAUTH_URL || '/api/auth/google'
+    window.location.href = googleUrl
+  }
 
   const mutation = useMutation({
     mutationFn: () => login(form),
@@ -39,6 +43,17 @@ export function LoginPage() {
           />
           <Button onClick={() => mutation.mutate()} isLoading={mutation.isPending} className="w-full">
             로그인
+          </Button>
+          <div className="relative flex items-center justify-center">
+            <span className="h-px w-full bg-surface-200" />
+            <span className="absolute bg-white px-2 text-xs text-surface-500">또는</span>
+          </div>
+          <Button
+            variant="secondary"
+            className="w-full bg-white text-surface-800 hover:border-primary-200 hover:bg-primary-50"
+            onClick={handleGoogleLogin}
+          >
+            <span className="text-sm font-medium">Google로 로그인</span>
           </Button>
         </div>
         <p className="text-center text-sm text-surface-600">

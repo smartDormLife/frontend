@@ -14,6 +14,14 @@ export interface User {
   created_at: string
 }
 
+export interface UserProfile {
+  name: string
+  email: string
+  dorm_name: string
+  room_no: string | null
+  phone: string | null
+}
+
 export type PostCategory =
   | 'delivery'
   | 'purchase'
@@ -36,6 +44,8 @@ export interface Post {
   user?: Pick<User, 'name' | 'dorm_id'>
   party?: Party | null
   comment_count?: number
+  max_member?: number | null
+  current_member_count?: number | null
 }
 
 export type PartyStatus = 'recruiting' | 'closed'

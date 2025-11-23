@@ -6,12 +6,24 @@ import { Button } from '../components/common/Button'
 import { Card } from '../components/common/Card'
 import { Select } from '../components/common/Select'
 import { dormApi } from '../api/dormApi'
+import type { Dormitory } from '../types'
 import { useAuth } from '../hooks/useAuth'
 
 export function RegisterPage() {
   const navigate = useNavigate()
   const { register } = useAuth()
-  const { data: dorms = [] } = useQuery({ queryKey: ['dormitories'], queryFn: dormApi.list })
+  const { data: dormsData = [] } = useQuery({ queryKey: ['dormitories'], queryFn: dormApi.list })
+
+  const fallbackDorms: Dormitory[] = [
+    { dorm_id: 1, dorm_name: '남제관' },
+    { dorm_id: 2, dorm_name: '용지관' },
+    { dorm_id: 3, dorm_name: '광교관' },
+    { dorm_id: 4, dorm_name: '화홍관' },
+    { dorm_id: 5, dorm_name: '국제학사관' },
+    { dorm_id: 6, dorm_name: '일신관' },
+  ]
+
+  const dorms = dormsData.length ? dormsData : fallbackDorms
 
   const [form, setForm] = useState({
     email: '',

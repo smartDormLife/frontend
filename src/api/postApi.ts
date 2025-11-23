@@ -7,6 +7,7 @@ export interface CreatePostPayload {
   title: string
   content: string
   price?: number | null
+  max_member?: number | null
   party?: Pick<Party, 'max_member' | 'deadline' | 'location'>
 }
 

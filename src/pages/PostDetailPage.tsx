@@ -53,6 +53,17 @@ export function PostDetailPage() {
     onSuccess: () => postQuery.refetch(),
   })
 
+  const deleteMutation = useMutation({
+    mutationFn: () => postApi.remove(post?.post_id ?? 0),
+    onSuccess: () => {
+      if (post?.dorm_id) {
+        navigate(`/board/${post.dorm_id}/${post.category}`)
+      } else {
+        navigate('/')
+      }
+    },
+  })
+
   const addCommentMutation = useMutation({
     mutationFn: () => postApi.addComment(Number(postId), comment),
     onSuccess: () => {
@@ -74,6 +85,9 @@ export function PostDetailPage() {
   const isOwner = user?.user_id === post.user_id
   const party = post.party
   const isJoined = party?.is_joined
+  const currentCount = party?.current_member_count ?? post.current_member_count ?? 0
+  const maxCount = party?.max_member ?? post.max_member ?? null
+  const isFull = maxCount != null ? currentCount >= maxCount : false
 
   const handleJoinOrLeave = () => {
     if (!party || party.status === 'closed') return
@@ -100,10 +114,27 @@ export function PostDetailPage() {
           </div>
           {isOwner && (
             <div className="flex gap-2">
-              <Button variant="secondary" size="sm" onClick={() => navigate(`/posts/new?edit=${post.post_id}`)}>
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() =>
+                  navigate(
+                    `/write?postId=${post.post_id}&category=${post.category}${
+                      post.dorm_id ? `&dormId=${post.dorm_id}` : ''
+                    }`,
+                  )
+                }
+              >
                 수정
               </Button>
-              <Button variant="ghost" size="sm">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => {
+                  if (confirm('정말 삭제하시겠어요?')) deleteMutation.mutate()
+                }}
+                isLoading={deleteMutation.isPending}
+              >
                 삭제
               </Button>
             </div>
@@ -122,7 +153,7 @@ export function PostDetailPage() {
           <div>
             <p className="text-sm font-semibold text-primary-600">파티 정보</p>
             <p className="text-lg font-bold text-surface-900">
-              인원 {party.current_member_count ?? 0}/{party.max_member} · {party.location ?? '장소 미정'}
+              인원 {currentCount}/{maxCount} · {party.location ?? '장소 미정'}
             </p>
             {party.deadline && <p className="text-sm text-surface-600">마감 {dayjs(party.deadline).fromNow()}</p>}
           </div>
@@ -132,8 +163,10 @@ export function PostDetailPage() {
                 onClick={handleJoinOrLeave}
                 isLoading={joinMutation.isPending || leaveMutation.isPending}
                 variant={isJoined ? 'secondary' : 'primary'}
+                disabled={isFull && !isJoined}
+                className={isFull && !isJoined ? 'opacity-40' : undefined}
               >
-                {isJoined ? '파티 나가기' : '파티 참여하기'}
+                {isFull && !isJoined ? '모집 마감' : isJoined ? '파티 나가기' : '파티 참여하기'}
               </Button>
             ) : (
               <Badge color="red">마감</Badge>

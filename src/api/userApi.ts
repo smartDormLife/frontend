@@ -1,11 +1,15 @@
 import axiosInstance from './axiosInstance'
-import type { PaginatedResponse, Post, User } from '../types'
+import type { PaginatedResponse, Post, User, UserProfile } from '../types'
 
 export interface UpdateProfilePayload extends Partial<Omit<User, 'user_id' | 'created_at' | 'email'>> {}
 
 export const userApi = {
   async me() {
     const { data } = await axiosInstance.get<User>('/users/me')
+    return data
+  },
+  async profile() {
+    const { data } = await axiosInstance.get<UserProfile>('/user/me')
     return data
   },
   async updateMe(payload: UpdateProfilePayload) {

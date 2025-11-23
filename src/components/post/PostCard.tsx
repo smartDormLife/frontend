@@ -31,7 +31,10 @@ export function PostCard({ post, onClick, compact }: PostCardProps) {
   }
 
   const party = post.party
-  const isRecruiting = party?.status === 'recruiting' && post.status === 'active'
+  const currentCount = party?.current_member_count ?? post.current_member_count ?? 0
+  const maxCount = party?.max_member ?? post.max_member ?? null
+  const isFull = maxCount != null ? currentCount >= maxCount : false
+  const isRecruiting = party?.status === 'recruiting' && post.status === 'active' && !isFull
 
   return (
     <Card
@@ -43,17 +46,21 @@ export function PostCard({ post, onClick, compact }: PostCardProps) {
           <div className="flex items-center gap-2">
             <Badge color="primary">{categoryLabel[post.category]}</Badge>
             {isRecruiting && <Badge color="green">모집중</Badge>}
-            {!isRecruiting && party && <Badge color="red">마감</Badge>}
+            {(isFull || (!isRecruiting && party)) && (
+              <span className="rounded-full bg-[#AFAFFF] px-3 py-1 text-xs font-medium text-surface-900">
+                모집 마감
+              </span>
+            )}
           </div>
           <h3 className="text-lg font-semibold text-surface-900">{post.title}</h3>
           <p className="line-clamp-2 text-sm text-surface-600">{post.content}</p>
-          {!compact && party && (
+          {!compact && maxCount && (
             <div className="flex flex-wrap items-center gap-3 text-sm text-surface-600">
               <span>
-                인원 {party.current_member_count ?? 0}/{party.max_member}
+                인원 {currentCount}/{maxCount}명 모집 중
               </span>
-              {party.deadline && <span>마감 {dayjs(party.deadline).fromNow()}</span>}
-              {party.location && <span>장소 {party.location}</span>}
+              {party?.deadline && <span>마감 {dayjs(party.deadline).fromNow()}</span>}
+              {party?.location && <span>장소 {party.location}</span>}
             </div>
           )}
         </div>

@@ -1,23 +1,37 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
-import { AppLayout } from './components/layout/AppLayout'
+import { Layout } from './components/layout/Layout'
 import { HomePage } from './pages/HomePage'
-import { BoardPage } from './pages/BoardPage'
 import { PostDetailPage } from './pages/PostDetailPage'
 import { PostCreatePage } from './pages/PostCreatePage'
 import { MyPage } from './pages/MyPage'
 import { LoginPage } from './pages/LoginPage'
 import { RegisterPage } from './pages/RegisterPage'
+import { DeliveryBoard } from './pages/boards/DeliveryBoard'
+import { PurchaseBoard } from './pages/boards/PurchaseBoard'
+import { UsedSaleBoard } from './pages/boards/UsedSaleBoard'
+import { GeneralBoard } from './pages/boards/GeneralBoard'
+import { TaxiBoard } from './pages/boards/TaxiBoard'
+import { UnauthorizedPage } from './pages/UnauthorizedPage'
+import { WritePostPage } from './pages/WritePostPage'
 
 export function AppRouter() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route element={<AppLayout />}>
+        <Route element={<Layout />}>
           <Route path="/" element={<HomePage />} />
-          <Route path="/dorm/:dormId" element={<BoardPage />} />
+          <Route path="/board/:dormId">
+            <Route path="delivery" element={<DeliveryBoard />} />
+            <Route path="purchase" element={<PurchaseBoard />} />
+            <Route path="taxi" element={<TaxiBoard />} />
+            <Route path="used_sale" element={<UsedSaleBoard />} />
+            <Route path="general" element={<GeneralBoard />} />
+          </Route>
           <Route path="/posts/new" element={<PostCreatePage />} />
+          <Route path="/write" element={<WritePostPage />} />
           <Route path="/posts/:postId" element={<PostDetailPage />} />
           <Route path="/mypage" element={<MyPage />} />
+          <Route path="/unauthorized" element={<UnauthorizedPage />} />
         </Route>
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
