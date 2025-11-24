@@ -25,11 +25,14 @@ export function BoardPageTemplate({ title, category, posts }: BoardPageTemplateP
   const { data: dorms } = useQuery({ queryKey: ['dormitories'], queryFn: dormApi.list })
 
   const currentDormId = dormId ? Number(dormId) : null
-  const unauthorized = user && currentDormId ? user.dorm_id !== currentDormId : false
-  const dormName = dorms?.find((d) => d.dorm_id === currentDormId)?.dorm_name ?? '기숙사'
+  const isTaxiBoard = category === 'taxi'
+  const unauthorized = isTaxiBoard ? false : user && currentDormId ? user.dorm_id !== currentDormId : false
+  const dormName = isTaxiBoard
+    ? '통합'
+    : dorms?.find((d) => d.dorm_id === currentDormId)?.dorm_name ?? '기숙사'
 
   const filtered = useMemo(() => {
-    const byDorm = currentDormId ? posts.filter((p) => p.dorm_id === currentDormId) : posts
+    const byDorm = isTaxiBoard || !currentDormId ? posts : posts.filter((p) => p.dorm_id === currentDormId)
     if (!query.trim()) return byDorm
     const q = query.toLowerCase()
     return byDorm.filter(
@@ -40,7 +43,12 @@ export function BoardPageTemplate({ title, category, posts }: BoardPageTemplateP
   if (unauthorized) return <UnauthorizedPage />
 
   const handleTabChange = (next: PostCategory) => {
-    navigate(`/board/${currentDormId}/${next}`)
+    if (next === 'taxi') {
+      navigate('/board/taxi')
+      return
+    }
+    const targetDorm = currentDormId ?? user?.dorm_id ?? 1
+    navigate(`/board/${targetDorm}/${next}`)
   }
 
   return (

@@ -8,9 +8,9 @@ interface CategoryTabsProps {
 
 const tabs: { key: PostCategory; label: string }[] = [
   { key: 'delivery', label: '배달 N빵' },
-  { key: 'purchase', label: '공구' },
-  { key: 'used_sale', label: '중고 거래' },
+  { key: 'purchase', label: '공구/중고' },
   { key: 'general', label: '자유게시판' },
+  { key: 'taxi', label: '택시 N빵' },
 ]
 
 export function CategoryTabs({ value, onChange }: CategoryTabsProps) {

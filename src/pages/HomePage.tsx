@@ -102,7 +102,7 @@ export function HomePage() {
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <BoardLinkCard title="배달 N빵 게시판" description="같이 배달하고 배달비 나누기" onClick={() => navigate('/board/1/delivery')} />
           <BoardLinkCard title="공구/중고 거래 게시판" description="공동구매 및 중고 거래" onClick={() => navigate('/board/1/purchase')} />
-          <BoardLinkCard title="택시 N빵 게시판" description="같이 이동하고 택시비 나누기" onClick={() => navigate('/board/1/taxi')} />
+          <BoardLinkCard title="택시 N빵 게시판" description="같이 이동하고 택시비 나누기" onClick={() => navigate('/board/taxi')} />
           <BoardLinkCard title="자유게시판" description="자유로운 소통 공간" onClick={() => navigate('/board/1/general')} />
         </div>
       </section>

@@ -78,9 +78,13 @@ export function WritePostPage() {
       }
     },
     onSuccess: () => {
-      const targetDorm = dormId ?? (detailQuery.data?.dorm_id ? String(detailQuery.data.dorm_id) : user?.dorm_id ? String(user?.dorm_id) : '1')
       const targetCategory = detailQuery.data?.category ?? category
-      navigate(`/board/${targetDorm}/${targetCategory}`)
+      if (targetCategory === 'taxi') {
+        navigate('/board/taxi')
+      } else {
+        const targetDorm = dormId ?? (detailQuery.data?.dorm_id ? String(detailQuery.data.dorm_id) : user?.dorm_id ? String(user?.dorm_id) : '1')
+        navigate(`/board/${targetDorm}/${targetCategory}`)
+      }
     },
   })
 

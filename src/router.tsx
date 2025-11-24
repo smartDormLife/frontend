@@ -8,7 +8,6 @@ import { LoginPage } from './pages/LoginPage'
 import { RegisterPage } from './pages/RegisterPage'
 import { DeliveryBoard } from './pages/boards/DeliveryBoard'
 import { PurchaseBoard } from './pages/boards/PurchaseBoard'
-import { UsedSaleBoard } from './pages/boards/UsedSaleBoard'
 import { GeneralBoard } from './pages/boards/GeneralBoard'
 import { TaxiBoard } from './pages/boards/TaxiBoard'
 import { UnauthorizedPage } from './pages/UnauthorizedPage'
@@ -20,11 +19,12 @@ export function AppRouter() {
       <Routes>
         <Route element={<Layout />}>
           <Route path="/" element={<HomePage />} />
+          <Route path="/board/taxi" element={<TaxiBoard />} />
           <Route path="/board/:dormId">
             <Route path="delivery" element={<DeliveryBoard />} />
             <Route path="purchase" element={<PurchaseBoard />} />
-            <Route path="taxi" element={<TaxiBoard />} />
-            <Route path="used_sale" element={<UsedSaleBoard />} />
+            {/* used_sale는 공구/중고 통합으로 purchase로 포워딩 */}
+            <Route path="used_sale" element={<PurchaseBoard />} />
             <Route path="general" element={<GeneralBoard />} />
           </Route>
           <Route path="/posts/new" element={<PostCreatePage />} />
