@@ -35,9 +35,9 @@ export function HomePage() {
         <div className="absolute right-16 top-8 hidden h-40 w-40 rounded-full bg-white/10 blur-3xl md:block" />
         <div className="relative grid gap-6 md:grid-cols-2">
           <div className="space-y-4">
-            <p className="text-sm uppercase tracking-wide text-white/70">슬기로운 긱사생활</p>
-            <h1 className="text-3xl font-bold md:text-4xl">기숙사생을 위한 커뮤니티</h1>
-            <p className="text-lg text-white/80">기숙사 선택부터 파티 모집까지 한 화면에서.</p>
+            <p className="text-sm uppercase tracking-wide text-white/80">슬기로운 긱사생활</p>
+            <h1 className="text-3xl font-bold text-white md:text-4xl">기숙사생을 위한 커뮤니티</h1>
+            <p className="text-lg text-white/90">기숙사 선택부터 파티 모집까지 한 화면에서.</p>
             <div className="flex gap-3">
               <Button onClick={() => navigate('/login')}>시작하기</Button>
               <Button variant="secondary" onClick={() => navigate('/register')}>

@@ -22,6 +22,9 @@ export function WritePostPage() {
   const [location, setLocation] = useState('')
   const [price, setPrice] = useState<number | ''>('')
   const postId = params.get('postId')
+  const [subCategory, setSubCategory] = useState<PostCategory>(
+    category === 'used_sale' ? 'used_sale' : category === 'purchase' ? 'purchase' : category,
+  )
 
   const detailQuery = useQuery({
     queryKey: ['writePost', postId],
@@ -37,29 +40,33 @@ export function WritePostPage() {
       if (detailQuery.data.party?.deadline) setDeadline(detailQuery.data.party.deadline)
       if (detailQuery.data.party?.location) setLocation(detailQuery.data.party.location)
       if (detailQuery.data.price != null) setPrice(detailQuery.data.price)
+      if (detailQuery.data.category) setSubCategory(detailQuery.data.category)
     }
   }, [detailQuery.data])
 
+  const effectiveCategory = subCategory
   const isPartyCategory = useMemo(
-    () => ['delivery', 'purchase', 'taxi'].includes(category),
-    [category],
+    () => ['delivery', 'purchase', 'taxi'].includes(effectiveCategory),
+    [effectiveCategory],
   )
   const isScheduleCategory = useMemo(
-    () => ['delivery', 'taxi'].includes(category),
-    [category],
+    () => ['delivery', 'taxi'].includes(effectiveCategory),
+    [effectiveCategory],
   )
-  const isPriceCategory = useMemo(
-    () => (detailQuery.data?.category ?? category) === 'used_sale',
-    [category, detailQuery.data?.category],
-  )
+  const isTaxiCategory = effectiveCategory === 'taxi'
+  const isPriceCategory = effectiveCategory === 'used_sale'
 
   const mutation = useMutation({
     mutationFn: async () => {
       const body: Record<string, unknown> = {
         title,
         content,
-        category: detailQuery.data?.category ?? category,
-        dorm_id: dormId ? Number(dormId) : detailQuery.data?.dorm_id ?? user?.dorm_id ?? null,
+        category: effectiveCategory,
+        dorm_id: isTaxiCategory
+          ? null
+          : dormId
+            ? Number(dormId)
+            : detailQuery.data?.dorm_id ?? user?.dorm_id ?? null,
       }
       if (isPartyCategory || detailQuery.data?.party) {
         body.max_member = maxMember
@@ -78,7 +85,7 @@ export function WritePostPage() {
       }
     },
     onSuccess: () => {
-      const targetCategory = detailQuery.data?.category ?? category
+      const targetCategory = effectiveCategory
       if (targetCategory === 'taxi') {
         navigate('/board/taxi')
       } else {
@@ -92,9 +99,22 @@ export function WritePostPage() {
     <div className="mx-auto flex max-w-3xl flex-col gap-6">
       <div className="space-y-2">
         <h1 className="text-2xl font-bold text-surface-900">글 작성</h1>
-        <p className="text-sm text-surface-600">카테고리: {detailQuery.data?.category ?? category}</p>
+        <p className="text-sm text-surface-600">카테고리: {effectiveCategory}</p>
       </div>
       <div className="space-y-4">
+        {(category === 'purchase' || category === 'used_sale' || effectiveCategory === 'purchase' || effectiveCategory === 'used_sale') && (
+          <div className="space-y-2">
+            <p className="text-sm font-semibold text-surface-800">구분</p>
+            <select
+              className="w-full rounded-xl border border-surface-200 bg-white px-3.5 py-2.5 text-sm text-surface-800 shadow-sm transition focus:border-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-100"
+              value={effectiveCategory}
+              onChange={(e) => setSubCategory(e.target.value as PostCategory)}
+            >
+              <option value="purchase">공구</option>
+              <option value="used_sale">중고</option>
+            </select>
+          </div>
+        )}
         <div className="space-y-2">
           <p className="text-sm font-semibold text-surface-800">제목</p>
           <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="제목을 입력하세요" />

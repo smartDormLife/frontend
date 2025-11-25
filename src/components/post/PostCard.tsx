@@ -53,7 +53,7 @@ export function PostCard({ post, onClick, compact }: PostCardProps) {
             )}
           </div>
           <h3 className="text-lg font-semibold text-surface-900">{post.title}</h3>
-          <p className="line-clamp-2 text-sm text-surface-600">{post.content}</p>
+          <p className="line-clamp-2 text-sm text-surface-700">{post.content}</p>
           {!compact && maxCount && (
             <div className="flex flex-wrap items-center gap-3 text-sm text-surface-600">
               <span>

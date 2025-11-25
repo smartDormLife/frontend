@@ -21,9 +21,9 @@ export function PostItem({ post, onClick }: PostItemProps) {
       <div className="flex items-start justify-between gap-3">
         <div className="space-y-2">
           <h3 className="text-lg font-semibold text-surface-900">{post.title}</h3>
-          <p className="line-clamp-2 text-sm text-surface-600">{post.content}</p>
+          <p className="line-clamp-2 text-sm text-surface-700">{post.content}</p>
         </div>
-        <div className="flex flex-col items-end text-xs text-surface-500">
+        <div className="flex flex-col items-end text-xs text-surface-600">
           <span>{post.user?.name ?? '익명'}</span>
           <span>{dayjs(post.created_at).fromNow()}</span>
         </div>
