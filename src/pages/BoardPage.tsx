@@ -30,7 +30,7 @@ export function BoardPage() {
     enabled: Boolean(dormId),
     queryFn: () =>
       postApi.list({
-        dormId: dormId ? Number(dormId) : undefined,
+        dorm_id: dormId ? Number(dormId) : undefined,
         category: category === 'all' ? undefined : category,
         status: status === 'all' ? undefined : status === 'recruiting' ? 'active' : 'closed',
         sort,

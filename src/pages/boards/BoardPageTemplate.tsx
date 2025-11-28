@@ -39,7 +39,7 @@ export function BoardPageTemplate({ title, category, posts = [] }: BoardPageTemp
     queryFn: () =>
       postApi.list({
         category: category === 'purchase' ? 'purchase' : category,
-        dormId: dormFilter,
+        dorm_id: dormFilter,
         status: 'active',
       }),
     enabled: isTaxiBoard || Boolean(dormFilter),
@@ -96,7 +96,13 @@ export function BoardPageTemplate({ title, category, posts = [] }: BoardPageTemp
 
       <div className="space-y-3">
         {filtered.length ? (
-          filtered.map((post) => <PostItem key={post.post_id} post={post} />)
+          filtered.map((post) => (
+            <PostItem
+              key={post.post_id}
+              post={post}
+              onClick={(id) => navigate(`/posts/${id}`)}
+            />
+          ))
         ) : (
           <EmptyState
             title="게시글이 없습니다"

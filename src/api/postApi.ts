@@ -25,6 +25,12 @@ export const postApi = {
     const { data } = await axiosInstance.get<PostListResponse>('/posts', { params })
     return data
   },
+  async recent(limit: number = 5) {
+    const { data } = await axiosInstance.get<{ posts: Post[] }>('/posts/recent', {
+      params: { limit },
+    })
+    return data
+  },
   async detail(postId: number) {
     const { data } = await axiosInstance.get<Post>(`/posts/${postId}`)
     return data

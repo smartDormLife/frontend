@@ -9,8 +9,8 @@ import type { Post } from '../types'
 export function HomePage() {
   const navigate = useNavigate()
   const { data: activePosts, isLoading } = useQuery({
-    queryKey: ['posts', 'activePreview'],
-    queryFn: () => postApi.list({ status: 'active', size: 5 }),
+    queryKey: ['posts', 'recent'],
+    queryFn: () => postApi.recent(5),
   })
   const safeActivePosts = Array.isArray(activePosts?.posts) ? activePosts.posts : []
 

@@ -90,7 +90,7 @@ export interface AuthResponse {
 }
 
 export interface PostQuery extends PaginationQuery {
-  dormId?: number
+  dorm_id?: number
   category?: PostCategory
   status?: PostStatus
   sort?: 'latest' | 'deadline'
