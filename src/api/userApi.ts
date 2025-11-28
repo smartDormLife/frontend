@@ -9,7 +9,7 @@ export const userApi = {
     return data
   },
   async profile() {
-    const { data } = await axiosInstance.get<UserProfile>('/user/me')
+    const { data } = await axiosInstance.get<UserProfile>('/users/me')
     return data
   },
   async updateMe(payload: UpdateProfilePayload) {

@@ -10,14 +10,15 @@ import type { Post, PostCategory } from '../../types'
 import { UnauthorizedPage } from '../UnauthorizedPage'
 import { dormApi } from '../../api/dormApi'
 import { useAuth } from '../../hooks/useAuth'
+import { postApi } from '../../api/postApi'
 
 interface BoardPageTemplateProps {
   title: string
   category: PostCategory
-  posts: Post[]
+  posts?: Post[]
 }
 
-export function BoardPageTemplate({ title, category, posts }: BoardPageTemplateProps) {
+export function BoardPageTemplate({ title, category, posts = [] }: BoardPageTemplateProps) {
   const { dormId } = useParams()
   const navigate = useNavigate()
   const [query, setQuery] = useState('')
@@ -31,14 +32,31 @@ export function BoardPageTemplate({ title, category, posts }: BoardPageTemplateP
     ? '통합'
     : dorms?.find((d) => d.dorm_id === currentDormId)?.dorm_name ?? '기숙사'
 
+  const dormFilter = isTaxiBoard ? undefined : currentDormId ?? user?.dorm_id ?? undefined
+
+  const listQuery = useQuery({
+    queryKey: ['boardPosts', category, dormFilter],
+    queryFn: () =>
+      postApi.list({
+        category: category === 'purchase' ? 'purchase' : category,
+        dormId: dormFilter,
+        status: 'active',
+      }),
+    enabled: isTaxiBoard || Boolean(dormFilter),
+  })
+
+  const apiPosts = Array.isArray(listQuery.data?.posts) ? listQuery.data?.posts : []
+  const postsSource = apiPosts.length ? apiPosts : posts
+
   const filtered = useMemo(() => {
-    const byDorm = isTaxiBoard || !currentDormId ? posts : posts.filter((p) => p.dorm_id === currentDormId)
+    const byDorm =
+      isTaxiBoard || !currentDormId ? postsSource : postsSource.filter((p) => p.dorm_id === currentDormId)
     if (!query.trim()) return byDorm
     const q = query.toLowerCase()
     return byDorm.filter(
       (p) => p.title.toLowerCase().includes(q) || p.content.toLowerCase().includes(q),
     )
-  }, [posts, query, currentDormId])
+  }, [postsSource, query, currentDormId, isTaxiBoard])
 
   if (unauthorized) return <UnauthorizedPage />
 
