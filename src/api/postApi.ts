@@ -11,7 +11,7 @@ export interface CreatePostPayload {
   party?: Pick<Party, 'max_member' | 'deadline' | 'location'>
 }
 
-export interface UpdatePostPayload extends Partial<CreatePostPayload> {}
+export type UpdatePostPayload = Partial<CreatePostPayload>
 
 export interface PostListResponse {
   posts: Post[]

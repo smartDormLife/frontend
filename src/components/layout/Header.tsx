@@ -30,6 +30,13 @@ export function Header() {
               <Button
                 variant="ghost"
                 size="sm"
+                onClick={() => navigate('/mypage')}
+              >
+                마이페이지
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
                 onClick={() => navigate('/chat')}
               >
                 채팅

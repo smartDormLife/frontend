@@ -35,6 +35,7 @@ export interface Post {
   post_id: number;
   user_id: number;
   dorm_id: number | null;
+  dorm_name?: string | null;
   category: PostCategory;
   title: string;
   content: string;
@@ -46,6 +47,7 @@ export interface Post {
   comment_count?: number;
   max_member?: number | null;
   current_member_count?: number | null;
+  party_role?: PartyRole;
 }
 
 export type PartyStatus = "recruiting" | "closed";
@@ -62,6 +64,8 @@ export interface Party {
   current_member_count?: number;
   is_joined?: boolean;
 }
+
+export type PartyRole = "host" | "member" | "guest";
 
 export interface Comment {
   comment_id: number;
@@ -82,6 +86,12 @@ export interface PaginatedResponse<T> {
   totalCount: number;
   page: number;
   size: number;
+}
+
+export interface MyComment extends Comment {
+  post: (Pick<Post, "post_id" | "title" | "category" | "status" | "dorm_id" | "dorm_name" | "current_member_count" | "comment_count" | "max_member"> & {
+    party?: Party | null;
+  }) | null;
 }
 
 export interface AuthResponse {

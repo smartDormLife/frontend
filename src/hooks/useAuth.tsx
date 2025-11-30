@@ -3,6 +3,18 @@ import { createContext, useContext, useEffect, useMemo, useState } from 'react'
 import { authApi } from '../api/authApi'
 import type { User } from '../types'
 
+const mockAuthEnabled = import.meta.env.VITE_ENABLE_MOCK_AUTH === 'true'
+const mockUser: User = {
+  user_id: 9999,
+  email: 'mock@example.com',
+  name: '남제관',
+  dorm_id: 1,
+  room_no: '101',
+  phone: '010-0000-0000',
+  account_number: '0000-00-000000',
+  created_at: new Date().toISOString(),
+}
+
 interface AuthContextValue {
   user: User | null
   token: string | null
@@ -30,6 +42,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const savedToken = localStorage.getItem('accessToken')
     const savedUser = localStorage.getItem('user')
+
+    // 개발·데모용: 백엔드 없이도 UI 확인을 위해 모의 로그인
+    if (mockAuthEnabled) {
+      const parsed = (() => {
+        if (!savedUser) return null
+        try {
+          return JSON.parse(savedUser) as User
+        } catch {
+          return null
+        }
+      })()
+
+      const fallbackUser = parsed ?? mockUser
+      setUser(fallbackUser)
+      setToken(savedToken ?? 'mock-token')
+      setIsLoading(false)
+      return
+    }
+
     if (savedToken) {
       setToken(savedToken)
     }
@@ -99,7 +130,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const value = useMemo(
     () => ({ user, token, isLoading, login, logout, register, setUser }),
-    [user, token, isLoading],
+    [user, token, isLoading, login, logout, register],
   )
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
