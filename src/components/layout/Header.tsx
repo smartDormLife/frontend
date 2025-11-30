@@ -26,12 +26,25 @@ export function Header() {
 
         <div className="flex items-center gap-3">
           {user ? (
-            <Button variant="ghost" size="sm" onClick={handleLogout}>
-              로그아웃
-            </Button>
+            <>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => navigate('/chat')}
+              >
+                채팅
+              </Button>
+              <Button variant="ghost" size="sm" onClick={handleLogout}>
+                로그아웃
+              </Button>
+            </>
           ) : (
             <>
-              <Button variant="ghost" size="sm" onClick={() => navigate('/login')}>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => navigate('/login')}
+              >
                 로그인
               </Button>
               <Button size="sm" onClick={() => navigate('/register')}>

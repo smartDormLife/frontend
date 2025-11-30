@@ -1,27 +1,28 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
-import type { ReactElement } from 'react'
-import { useAuth } from './hooks/useAuth'
-import { Layout } from './components/layout/Layout'
-import { HomePage } from './pages/HomePage'
-import { PostDetailPage } from './pages/PostDetailPage'
-import { PostCreatePage } from './pages/PostCreatePage'
-import { MyPage } from './pages/MyPage'
-import { LoginPage } from './pages/LoginPage'
-import { RegisterPage } from './pages/RegisterPage'
-import { DeliveryBoard } from './pages/boards/DeliveryBoard'
-import { PurchaseBoard } from './pages/boards/PurchaseBoard'
-import { GeneralBoard } from './pages/boards/GeneralBoard'
-import { TaxiBoard } from './pages/boards/TaxiBoard'
-import { UnauthorizedPage } from './pages/UnauthorizedPage'
-import { WritePostPage } from './pages/WritePostPage'
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import type { ReactElement } from "react";
+import { useAuth } from "./hooks/useAuth";
+import { Layout } from "./components/layout/Layout";
+import { HomePage } from "./pages/HomePage";
+import { PostDetailPage } from "./pages/PostDetailPage";
+import { PostCreatePage } from "./pages/PostCreatePage";
+import { MyPage } from "./pages/MyPage";
+import { LoginPage } from "./pages/LoginPage";
+import { RegisterPage } from "./pages/RegisterPage";
+import { DeliveryBoard } from "./pages/boards/DeliveryBoard";
+import { PurchaseBoard } from "./pages/boards/PurchaseBoard";
+import { GeneralBoard } from "./pages/boards/GeneralBoard";
+import { TaxiBoard } from "./pages/boards/TaxiBoard";
+import { UnauthorizedPage } from "./pages/UnauthorizedPage";
+import { WritePostPage } from "./pages/WritePostPage";
+import { ChatPage } from "./pages/ChatPage";
 
 export function AppRouter() {
   const Protected = ({ children }: { children: ReactElement }) => {
-    const { user, isLoading } = useAuth()
-    if (isLoading) return null
-    if (!user) return <Navigate to="/login" replace />
-    return children
-  }
+    const { user, isLoading } = useAuth();
+    if (isLoading) return null;
+    if (!user) return <Navigate to="/login" replace />;
+    return children;
+  };
 
   return (
     <BrowserRouter>
@@ -46,6 +47,8 @@ export function AppRouter() {
           <Route path="/write" element={<WritePostPage />} />
           <Route path="/posts/:postId" element={<PostDetailPage />} />
           <Route path="/mypage" element={<MyPage />} />
+          <Route path="/chat" element={<ChatPage />} />
+          <Route path="/chat/:roomId" element={<ChatPage />} />
           <Route path="/unauthorized" element={<UnauthorizedPage />} />
         </Route>
         <Route path="/login" element={<LoginPage />} />
@@ -53,5 +56,5 @@ export function AppRouter() {
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
-  )
+  );
 }
