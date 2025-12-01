@@ -4,10 +4,14 @@ import { postApi } from '../api/postApi'
 import { Card } from '../components/common/Card'
 import { Button } from '../components/common/Button'
 import { PostCard } from '../components/post/PostCard'
+import { useAuth } from '../hooks/useAuth'
 import type { Post } from '../types'
 
 export function HomePage() {
   const navigate = useNavigate()
+  const { user } = useAuth()
+  const dormId = user?.dorm_id ?? 1
+
   const { data: activePosts, isLoading } = useQuery({
     queryKey: ['posts', 'recent'],
     queryFn: () => postApi.recent(5),
@@ -19,7 +23,7 @@ export function HomePage() {
       <section className="space-y-4">
         <div className="flex items-center justify-between">
           <h2 className="text-xl font-bold text-surface-900">최근 활성 파티</h2>
-          <Button variant="ghost" onClick={() => navigate('/board/1/delivery')}>
+          <Button variant="ghost" onClick={() => navigate(`/board/${dormId}/delivery`)}>
             더 보기
           </Button>
         </div>
@@ -32,10 +36,10 @@ export function HomePage() {
           <p className="text-sm text-surface-600">배달/공구/택시/자유 게시판으로 이동하세요</p>
         </div>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <BoardLinkCard title="배달 N빵 게시판" description="같이 배달하고 배달비 나누기" onClick={() => navigate('/board/1/delivery')} />
-          <BoardLinkCard title="공구/중고 거래 게시판" description="공동구매 및 중고 거래" onClick={() => navigate('/board/1/purchase')} />
+          <BoardLinkCard title="배달 N빵 게시판" description="같이 배달하고 배달비 나누기" onClick={() => navigate(`/board/${dormId}/delivery`)} />
+          <BoardLinkCard title="공구/중고 거래 게시판" description="공동구매 및 중고 거래" onClick={() => navigate(`/board/${dormId}/purchase`)} />
           <BoardLinkCard title="택시 N빵 게시판" description="같이 이동하고 택시비 나누기" onClick={() => navigate('/board/taxi')} />
-          <BoardLinkCard title="자유게시판" description="자유로운 소통 공간" onClick={() => navigate('/board/1/general')} />
+          <BoardLinkCard title="자유게시판" description="자유로운 소통 공간" onClick={() => navigate(`/board/${dormId}/general`)} />
         </div>
       </section>
     </div>
