@@ -21,13 +21,22 @@ interface BoardPageTemplateProps {
 export function BoardPageTemplate({ title, category, posts = [] }: BoardPageTemplateProps) {
   const { dormId } = useParams()
   const navigate = useNavigate()
+  const { user, isLoading } = useAuth()
   const [query, setQuery] = useState('')
-  const { user } = useAuth()
   const { data: dorms } = useQuery({ queryKey: ['dormitories'], queryFn: dormApi.list })
+  
+  if (isLoading) {
+    return <p>로딩중...</p>
+  } 
+
 
   const currentDormId = dormId ? Number(dormId) : null
   const isTaxiBoard = category === 'taxi'
-  const unauthorized = isTaxiBoard ? false : user && currentDormId ? user.dorm_id !== currentDormId : false
+  const unauthorized =
+    !isTaxiBoard &&
+    user &&
+    currentDormId &&
+    user.dorm_id !== currentDormId
   const dormName = isTaxiBoard
     ? '통합'
     : dorms?.find((d) => d.dorm_id === currentDormId)?.dorm_name ?? '기숙사'
@@ -65,7 +74,7 @@ export function BoardPageTemplate({ title, category, posts = [] }: BoardPageTemp
       navigate('/board/taxi')
       return
     }
-    const targetDorm = currentDormId ?? user?.dorm_id ?? 1
+    const targetDorm = currentDormId ?? user?.dorm_id
     navigate(`/board/${targetDorm}/${next}`)
   }
 
