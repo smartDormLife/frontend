@@ -1,5 +1,5 @@
 import { useSearchParams, useNavigate } from 'react-router-dom'
-import { useMutation, useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'  // ✅ useQueryClient 추가
 import { useMemo, useState, useEffect } from 'react'
 import { Input } from '../components/common/Input'
 import { Textarea } from '../components/common/Textarea'
@@ -12,6 +12,7 @@ import { postApi } from '../api/postApi'
 export function WritePostPage() {
   const [params] = useSearchParams()
   const navigate = useNavigate()
+  const queryClient = useQueryClient()  // ✅ 추가
   const category = (params.get('category') as PostCategory) || 'general'
   const dormId = params.get('dormId')
   const { user } = useAuth()
@@ -83,9 +84,29 @@ export function WritePostPage() {
       } else {
         await axiosInstance.post('/posts', body)
       }
+      
+      // ✅ 작성/수정된 게시글 정보 반환
+      return {
+        category: effectiveCategory,
+        dorm_id: body.dorm_id
+      }
     },
-    onSuccess: () => {
-      const targetCategory = effectiveCategory
+    onSuccess: (data) => {
+      const targetCategory = data.category
+      const targetDormId = data.dorm_id
+      
+      // ✅ 해당 게시판의 캐시 무효화 (목록 자동 새로고침)
+      if (targetCategory === 'taxi') {
+        queryClient.invalidateQueries({ 
+          queryKey: ['boardPosts', 'taxi'] 
+        })
+      } else {
+        queryClient.invalidateQueries({ 
+          queryKey: ['boardPosts', targetCategory, targetDormId] 
+        })
+      }
+      
+      // ✅ 게시판으로 이동
       if (targetCategory === 'taxi') {
         navigate('/board/taxi')
       } else {

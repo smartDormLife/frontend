@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
 import { PostForm, type PostFormValues } from '../components/post/PostForm'
 import { dormApi } from '../api/dormApi'
@@ -8,6 +8,7 @@ import { useAuth } from '../hooks/useAuth'
 
 export function PostCreatePage() {
   const navigate = useNavigate()
+  const queryClient = useQueryClient()
   const { user } = useAuth()
   const { data: dorms = [] } = useQuery({ queryKey: ['dormitories'], queryFn: dormApi.list })
 
@@ -24,7 +25,16 @@ export function PostCreatePage() {
                 location: values.party.location ?? null,
               },
       }),
-    onSuccess: (post) => navigate(`/posts/${post.post_id}`),
+
+    onSuccess: (post) => {
+      // 🔥 글 목록 캐시 강제 갱신
+      queryClient.invalidateQueries(['boardPosts'])
+      queryClient.invalidateQueries(['posts'])
+      queryClient.invalidateQueries(['recent'])
+      queryClient.invalidateQueries(['post'])
+
+      navigate(`/posts/${post.post_id}`)
+    },
   })
 
   return (

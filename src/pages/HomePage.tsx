@@ -10,7 +10,9 @@ import type { Post } from '../types'
 export function HomePage() {
   const navigate = useNavigate()
   const { user } = useAuth()
+
   const dormId = user?.dorm_id ?? 1
+
 
   const { data: activePosts, isLoading } = useQuery({
     queryKey: ['posts', 'recent'],
