@@ -45,13 +45,20 @@ export function PostCard({ post, onClick, compact }: PostCardProps) {
         <div className="space-y-2">
           <div className="flex items-center gap-2">
             <Badge color="primary">{categoryLabel[post.category]}</Badge>
-            {isRecruiting && <Badge color="green">모집중</Badge>}
-            {(isFull || (!isRecruiting && party)) && (
+
+            {/* 모집중 */}
+            {party?.status === 'recruiting' && !isFull && (
+              <Badge color="green">모집중</Badge>
+            )}
+
+            {/* 모집 마감 — 파티가 closed 상태거나 정원이 꽉 찬 경우 */}
+            {(party?.status === 'closed' || isFull) && (
               <span className="rounded-full bg-[#AFAFFF] px-3 py-1 text-xs font-medium text-surface-900">
                 모집 마감
               </span>
             )}
           </div>
+
           <h3 className="text-lg font-semibold text-surface-900">{post.title}</h3>
           <p className="line-clamp-2 text-sm text-surface-700">{post.content}</p>
           {!compact && maxCount && (

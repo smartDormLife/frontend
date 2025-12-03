@@ -135,7 +135,11 @@ export function PostDetailPage() {
           <div className="space-y-2">
             <div className="flex gap-2">
               <Badge color="primary">{categoryLabel[post.category]}</Badge>
-              {post.status === 'active' ? <Badge color="green">진행중</Badge> : <Badge color="red">마감</Badge>}
+              {party?.status === 'recruiting' ? (
+                <Badge color="green">모집중</Badge>
+              ) : (
+                <Badge color="red">모집 마감</Badge>
+              )}
             </div>
             <h1 className="text-2xl font-bold text-surface-900">{post.title}</h1>
             <p className="text-sm text-surface-600">
