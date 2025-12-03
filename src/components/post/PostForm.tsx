@@ -48,6 +48,7 @@ export function PostForm({ dormitories, defaultDormId, defaultValues, onSubmit, 
   })
 
   const isPartyCategory = values.category !== 'general'
+  const needsAppointmentTime = values.category === 'delivery' || values.category === 'taxi'
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -145,19 +146,21 @@ export function PostForm({ dormitories, defaultDormId, defaultValues, onSubmit, 
             required
           />
           </div>
-          <div className="space-y-2">
-            <p className="text-sm font-semibold text-surface-800">마감 시간</p>
-            <Input
-              type="datetime-local"
-              value={values.party?.deadline ?? ''}
-            onChange={(e) =>
-              setValues((prev) => ({
-                ...prev,
-                party: { ...ensureParty(prev), deadline: e.target.value || null },
-              }))
-            }
-          />
-          </div>
+          {needsAppointmentTime && (
+            <div className="space-y-2">
+              <p className="text-sm font-semibold text-surface-800">약속시간</p>
+              <Input
+                type="datetime-local"
+                value={values.party?.deadline ?? ''}
+              onChange={(e) =>
+                setValues((prev) => ({
+                  ...prev,
+                  party: { ...ensureParty(prev), deadline: e.target.value || null },
+                }))
+              }
+            />
+            </div>
+          )}
           <div className="space-y-2">
             <p className="text-sm font-semibold text-surface-800">만날 장소</p>
             <Input

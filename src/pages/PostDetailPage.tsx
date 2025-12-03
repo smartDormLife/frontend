@@ -6,6 +6,7 @@ import relativeTime from 'dayjs/plugin/relativeTime'
 import 'dayjs/locale/ko'
 import { postApi } from '../api/postApi'
 import { partyApi } from '../api/partyApi'
+import { chatApi } from '../api/chatApi'
 import { Button } from '../components/common/Button'
 import { Badge } from '../components/common/Badge'
 import { Card } from '../components/common/Card'
@@ -98,6 +99,35 @@ export function PostDetailPage() {
     joinMutation.mutate()
   }
 
+  const handleEnterChat = async () => {
+    if (!party) return
+    try {
+      // 1. 먼저 기존 채팅방 목록 조회
+      const rooms = await chatApi.getRooms()
+      let chatRoom = rooms.find((room) => room.party_id === party.party_id)
+
+      // 2. 채팅방이 없으면 생성
+      if (!chatRoom) {
+        try {
+          chatRoom = await chatApi.createRoom(party.party_id)
+        } catch (createError: any) {
+          // 백엔드 미구현 시 명확한 메시지 표시
+          console.error('채팅방 생성 실패:', createError)
+          alert('채팅방 생성 기능이 아직 준비되지 않았습니다. 백엔드 구현을 기다려주세요.')
+          return
+        }
+      }
+
+      // 3. 채팅방으로 이동
+      if (chatRoom) {
+        navigate(`/chat/${chatRoom.room_id}`)
+      }
+    } catch (error) {
+      console.error('채팅방 조회 실패:', error)
+      alert('채팅방을 불러오는데 실패했습니다. 백엔드 연결을 확인해주세요.')
+    }
+  }
+
   return (
     <div className="space-y-6">
       <Card className="space-y-4">
@@ -155,10 +185,21 @@ export function PostDetailPage() {
             <p className="text-lg font-bold text-surface-900">
               인원 {currentCount}/{maxCount} · {party.location ?? '장소 미정'}
             </p>
-            {party.deadline && <p className="text-sm text-surface-600">마감 {dayjs(party.deadline).fromNow()}</p>}
+            {party.deadline && (post.category === 'delivery' || post.category === 'taxi') && (
+              <p className="text-sm text-surface-600">
+                약속시간: {dayjs(party.deadline).format('M월 D일 HH:mm')}
+                ({dayjs(party.deadline).isAfter(dayjs())
+                  ? dayjs(party.deadline).fromNow()
+                  : '시간 초과'})
+              </p>
+            )}
           </div>
           <div className="flex gap-2">
-            {party.status === 'recruiting' ? (
+            {isFull && isJoined ? (
+              <Button onClick={handleEnterChat} variant="primary">
+                채팅방 입장하기
+              </Button>
+            ) : party.status === 'recruiting' ? (
               <Button
                 onClick={handleJoinOrLeave}
                 isLoading={joinMutation.isPending || leaveMutation.isPending}

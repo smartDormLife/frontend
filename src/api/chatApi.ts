@@ -12,6 +12,13 @@ export const chatApi = {
     return data;
   },
 
+  async createRoom(partyId: number) {
+    const { data } = await axiosInstance.post<ChatRoom>("/chat/rooms", {
+      party_id: partyId,
+    });
+    return data;
+  },
+
   async getMessages(roomId: number) {
     const { data } = await axiosInstance.get<ChatMessage[]>(
       `/chat/rooms/${roomId}/messages`
