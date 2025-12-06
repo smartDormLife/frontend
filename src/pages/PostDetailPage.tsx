@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { useMutation, useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import 'dayjs/locale/ko'
@@ -31,6 +31,7 @@ export function PostDetailPage() {
   const navigate = useNavigate()
   const { user } = useAuth()
   const [comment, setComment] = useState('')
+  const queryClient = useQueryClient()
 
   const postQuery = useQuery({
     queryKey: ['post', postId],
@@ -46,17 +47,28 @@ export function PostDetailPage() {
 
   const joinMutation = useMutation({
     mutationFn: () => partyApi.join(postQuery.data?.party?.party_id ?? 0),
-    onSuccess: () => postQuery.refetch(),
+    onSuccess: () => {
+      postQuery.refetch()
+      // 목록 데이터도 갱신하여 뒤로가기 시 최신 상태 반영
+      queryClient.invalidateQueries({ queryKey: ['boardPosts'] })
+      queryClient.invalidateQueries({ queryKey: ['myParties'] })
+    },
   })
 
   const leaveMutation = useMutation({
     mutationFn: () => partyApi.leave(postQuery.data?.party?.party_id ?? 0),
-    onSuccess: () => postQuery.refetch(),
+    onSuccess: () => {
+      postQuery.refetch()
+      queryClient.invalidateQueries({ queryKey: ['boardPosts'] })
+      queryClient.invalidateQueries({ queryKey: ['myParties'] })
+    },
   })
 
   const deleteMutation = useMutation({
     mutationFn: () => postApi.remove(post?.post_id ?? 0),
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['boardPosts'] })
+      queryClient.invalidateQueries({ queryKey: ['myPosts'] })
       if (post?.dorm_id) {
         navigate(`/board/${post.dorm_id}/${post.category}`)
       } else {
@@ -70,12 +82,25 @@ export function PostDetailPage() {
     onSuccess: () => {
       setComment('')
       commentsQuery.refetch()
+      queryClient.invalidateQueries({ queryKey: ['myComments'] })
     },
   })
 
   const deleteCommentMutation = useMutation({
     mutationFn: (commentId: number) => postApi.deleteComment(commentId),
-    onSuccess: () => commentsQuery.refetch(),
+    onSuccess: () => {
+      commentsQuery.refetch()
+      queryClient.invalidateQueries({ queryKey: ['myComments'] })
+    },
+  })
+
+  const closeMutation = useMutation({
+    mutationFn: () => partyApi.close(postQuery.data?.party?.party_id ?? 0),
+    onSuccess: () => {
+      postQuery.refetch()
+      queryClient.invalidateQueries({ queryKey: ['boardPosts'] })
+      queryClient.invalidateQueries({ queryKey: ['myParties'] })
+    },
   })
 
   const post = postQuery.data
@@ -90,14 +115,7 @@ export function PostDetailPage() {
   const maxCount = party?.max_member ?? post.max_member ?? null
   const isFull = maxCount != null ? currentCount >= maxCount : false
 
-  const handleJoinOrLeave = () => {
-    if (!party || party.status === 'closed') return
-    if (isJoined) {
-      leaveMutation.mutate()
-      return
-    }
-    joinMutation.mutate()
-  }
+
 
   const handleEnterChat = async () => {
     if (!party) return
@@ -128,6 +146,14 @@ export function PostDetailPage() {
     }
   }
 
+
+
+  const handleCloseParty = () => {
+    if (confirm('파티를 마감하시겠습니까?')) {
+      closeMutation.mutate()
+    }
+  }
+
   return (
     <div className="space-y-6">
       <Card className="space-y-4">
@@ -149,8 +175,7 @@ export function PostDetailPage() {
                 size="sm"
                 onClick={() =>
                   navigate(
-                    `/write?postId=${post.post_id}&category=${post.category}${
-                      post.dorm_id ? `&dormId=${post.dorm_id}` : ''
+                    `/write?postId=${post.post_id}&category=${post.category}${post.dorm_id ? `&dormId=${post.dorm_id}` : ''
                     }`,
                   )
                 }
@@ -178,6 +203,8 @@ export function PostDetailPage() {
         </div>
       </Card>
 
+
+
       {party && (
         <Card className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
           <div>
@@ -195,22 +222,57 @@ export function PostDetailPage() {
             )}
           </div>
           <div className="flex gap-2">
-            {isFull && isJoined ? (
-              <Button onClick={handleEnterChat} variant="primary">
-                채팅방 입장하기
-              </Button>
-            ) : party.status === 'recruiting' ? (
-              <Button
-                onClick={handleJoinOrLeave}
-                isLoading={joinMutation.isPending || leaveMutation.isPending}
-                variant={isJoined ? 'secondary' : 'primary'}
-                disabled={isFull && !isJoined}
-                className={isFull && !isJoined ? 'opacity-40' : undefined}
-              >
-                {isFull && !isJoined ? '모집 마감' : isJoined ? '파티 나가기' : '파티 참여하기'}
-              </Button>
-            ) : (
-              <Badge color="red">마감</Badge>
+            {/* 호스트인 경우 */}
+            {isOwner && (
+              <>
+                <Button onClick={handleEnterChat} variant="primary">
+                  채팅방 입장하기
+                </Button>
+                {party.status === 'recruiting' ? (
+                  <Button
+                    onClick={handleCloseParty}
+                    isLoading={closeMutation.isPending}
+                    variant="secondary"
+                  >
+                    파티 마감하기
+                  </Button>
+                ) : (
+                  <Badge color="red">마감됨</Badge>
+                )}
+              </>
+            )}
+
+            {/* 멤버인 경우 (호스트 제외) */}
+            {!isOwner && isJoined && (
+              <>
+                <Button onClick={handleEnterChat} variant="primary">
+                  채팅방 입장하기
+                </Button>
+                <Button
+                  onClick={() => {
+                    if (confirm('파티에서 나가시겠습니까?')) leaveMutation.mutate()
+                  }}
+                  isLoading={leaveMutation.isPending}
+                  variant="secondary"
+                >
+                  파티 나가기
+                </Button>
+              </>
+            )}
+
+            {/* 참여하지 않은 경우 */}
+            {!isOwner && !isJoined && (
+              party.status === 'recruiting' && !isFull ? (
+                <Button
+                  onClick={() => joinMutation.mutate()}
+                  isLoading={joinMutation.isPending}
+                  variant="primary"
+                >
+                  파티 참여하기
+                </Button>
+              ) : (
+                <Badge color="red">마감</Badge>
+              )
             )}
           </div>
         </Card>

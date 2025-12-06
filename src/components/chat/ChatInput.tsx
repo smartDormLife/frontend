@@ -9,6 +9,7 @@ interface ChatInputProps {
 
 export function ChatInput({ onSend, disabled }: ChatInputProps) {
   const [content, setContent] = useState("");
+  const [isComposing, setIsComposing] = useState(false);
 
   const handleSend = () => {
     const trimmed = content.trim();
@@ -19,10 +20,19 @@ export function ChatInput({ onSend, disabled }: ChatInputProps) {
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter" && !e.shiftKey) {
+    // 한글 입력 중(조합 중)일 때는 Enter를 무시
+    if (e.key === "Enter" && !e.shiftKey && !isComposing) {
       e.preventDefault();
       handleSend();
     }
+  };
+
+  const handleCompositionStart = () => {
+    setIsComposing(true);
+  };
+
+  const handleCompositionEnd = () => {
+    setIsComposing(false);
   };
 
   return (
@@ -31,6 +41,8 @@ export function ChatInput({ onSend, disabled }: ChatInputProps) {
         value={content}
         onChange={(e) => setContent(e.target.value)}
         onKeyDown={handleKeyDown}
+        onCompositionStart={handleCompositionStart}
+        onCompositionEnd={handleCompositionEnd}
         placeholder="메시지를 입력하세요"
         disabled={disabled}
         className="flex-1"

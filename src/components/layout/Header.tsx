@@ -1,10 +1,16 @@
 import { Link, useNavigate } from 'react-router-dom'
 import { Button } from '../common/Button'
 import { useAuth } from '../../hooks/useAuth'
+import { useUnreadChatCount } from '../../hooks/useUnreadChatCount'
+import { useChatNotifications } from '../../hooks/useChatNotifications'
 
 export function Header() {
   const { user, logout } = useAuth()
   const navigate = useNavigate()
+  const { hasUnread } = useUnreadChatCount()
+
+  // 헤더에서도 실시간 채팅 알림 수신
+  useChatNotifications(true)
 
   const handleLogout = async () => {
     await logout()
@@ -34,13 +40,17 @@ export function Header() {
               >
                 마이페이지
               </Button>
-              <Button
-                variant="ghost"
-                size="sm"
+              <button
                 onClick={() => navigate('/chat')}
+                className="relative rounded-lg px-3 py-2 text-sm font-medium text-surface-600 transition hover:bg-surface-50 hover:text-primary-700"
               >
                 채팅
-              </Button>
+                {hasUnread && (
+                  <span className="absolute -right-1 -top-1 rounded-full bg-red-500 px-1.5 py-0.5 text-[10px] font-bold text-white shadow-lg">
+                    NEW
+                  </span>
+                )}
+              </button>
               <Button variant="ghost" size="sm" onClick={handleLogout}>
                 로그아웃
               </Button>

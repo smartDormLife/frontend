@@ -84,7 +84,7 @@ export function WritePostPage() {
       } else {
         await axiosInstance.post('/posts', body)
       }
-      
+
       // ✅ 작성/수정된 게시글 정보 반환
       return {
         category: effectiveCategory,
@@ -94,18 +94,19 @@ export function WritePostPage() {
     onSuccess: (data) => {
       const targetCategory = data.category
       const targetDormId = data.dorm_id
-      
+
       // ✅ 해당 게시판의 캐시 무효화 (목록 자동 새로고침)
       if (targetCategory === 'taxi') {
-        queryClient.invalidateQueries({ 
-          queryKey: ['boardPosts', 'taxi'] 
+        queryClient.invalidateQueries({
+          queryKey: ['boardPosts', 'taxi']
         })
       } else {
-        queryClient.invalidateQueries({ 
-          queryKey: ['boardPosts', targetCategory, targetDormId] 
+        queryClient.invalidateQueries({
+          queryKey: ['boardPosts', targetCategory, targetDormId]
         })
       }
-      
+      queryClient.invalidateQueries({ queryKey: ['myPosts'] })
+
       // ✅ 게시판으로 이동
       if (targetCategory === 'taxi') {
         navigate('/board/taxi')

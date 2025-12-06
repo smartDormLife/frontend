@@ -63,9 +63,14 @@ function PostCardListPreview({ data, isLoading }: { data: Post[] | undefined; is
   )
 }
 
-function BoardLinkCard({ title, description, onClick }: { title: string; description: string; onClick: () => void }) {
+function BoardLinkCard({ title, description, onClick, badge }: { title: string; description: string; onClick: () => void; badge?: number }) {
   return (
-    <Card className="cursor-pointer border border-surface-100 transition hover:-translate-y-0.5 hover:border-primary-100" onClick={onClick}>
+    <Card className="relative cursor-pointer border border-surface-100 transition hover:-translate-y-0.5 hover:border-primary-100" onClick={onClick}>
+      {badge !== undefined && badge > 0 && (
+        <span className="absolute -right-2 -top-2 flex h-6 min-w-[24px] items-center justify-center rounded-full bg-red-500 px-2 text-xs font-bold text-white shadow-lg">
+          {badge > 99 ? '99+' : badge}
+        </span>
+      )}
       <div className="space-y-2">
         <h3 className="text-lg font-semibold text-surface-900">{title}</h3>
         <p className="text-sm text-surface-600">{description}</p>

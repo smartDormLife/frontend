@@ -14,4 +14,8 @@ export const partyApi = {
     const { data } = await axiosInstance.get<Party>(`/parties/${partyId}`)
     return data
   },
+  async close(partyId: number) {
+    const { data } = await axiosInstance.post(`/parties/${partyId}/close`)
+    return data
+  },
 }

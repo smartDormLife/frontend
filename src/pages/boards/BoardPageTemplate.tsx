@@ -24,10 +24,10 @@ export function BoardPageTemplate({ title, category, posts = [] }: BoardPageTemp
   const { user, isLoading } = useAuth()
   const [query, setQuery] = useState('')
   const { data: dorms } = useQuery({ queryKey: ['dormitories'], queryFn: dormApi.list })
-  
+
   if (isLoading) {
     return <p>로딩중...</p>
-  } 
+  }
 
 
   const currentDormId = dormId ? Number(dormId) : null
@@ -89,15 +89,7 @@ export function BoardPageTemplate({ title, category, posts = [] }: BoardPageTemp
           <div className="w-full sm:w-80">
             <Input placeholder="제목, 내용 검색" value={query} onChange={(e) => setQuery(e.target.value)} />
           </div>
-          <Button
-            size="md"
-            className="whitespace-nowrap"
-            onClick={() =>
-              navigate(`/write?category=${category}${currentDormId ? `&dormId=${currentDormId}` : ''}`)
-            }
-          >
-            글쓰기
-          </Button>
+
         </div>
       </header>
 

@@ -125,6 +125,7 @@ export interface ChatMessage {
   timestamp: string;
   sender?: Pick<User, "name">;
   is_mine?: boolean;
+  is_unread?: boolean;
 }
 
 export interface ChatMember {
