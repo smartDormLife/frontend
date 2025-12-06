@@ -1,4 +1,5 @@
 import { BoardPageTemplate } from './BoardPageTemplate'
+<<<<<<< HEAD
 import type { Post } from '../../types'
 
 const posts: Post[] = [
@@ -29,9 +30,35 @@ const posts: Post[] = [
   //   party: { party_id: 2, post_id: 202, host_id: 22, location: '기숙사 앞', deadline: null, max_member: 3, status: 'recruiting', created_at: '2025-02-02T07:00:00Z', current_member_count: 1 },
   // },
 ]
+=======
+import { useQuery } from '@tanstack/react-query'
+import { postApi } from '../../api/postApi'
+import { useAuth } from '../../hooks/useAuth'
+>>>>>>> c32b7d3e63d2fd4231d5a5d500f46de806d581a9
 
 export function TaxiBoard() {
-  return <BoardPageTemplate title="택시 N빵 게시판" category="taxi" posts={posts} />
+  const { user } = useAuth()
+
+  const { data, isLoading } = useQuery({
+    queryKey: ['posts', 'taxi'],
+    queryFn: () =>
+      postApi.list({
+        category: 'taxi',
+        dorm_id: null, // ⭐ 택시는 dorm_id null로 고정
+        status: 'active'
+      }),
+  })
+
+  const posts = data?.posts ?? []
+
+  return (
+    <BoardPageTemplate
+      title="택시 N빵 게시판"
+      category="taxi"
+      posts={posts}
+      isLoading={isLoading}
+    />
+  )
 }
 
 export default TaxiBoard
